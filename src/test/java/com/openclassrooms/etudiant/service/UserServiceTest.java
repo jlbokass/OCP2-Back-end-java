@@ -30,6 +30,8 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserService userService;
+    @Mock
+    private JwtService jwtService;
 
     @Test
     public void test_create_null_user_throws_IllegalArgumentException() {
@@ -74,5 +76,25 @@ public class UserServiceTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userCaptor.capture());
         assertThat(userCaptor.getValue()).isEqualTo(user);
+    }
+
+    @Test
+    public void test_login_with_valid_credentials_returns_jwt() {
+        // GIVEN
+        User user = new User();
+        user.setLogin(LOGIN);
+        user.setPassword("HASHED_PASSWORD");
+
+        when(userRepository.findByLogin(LOGIN)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(PASSWORD, user.getPassword())).thenReturn(true);
+        when(jwtService.generateToken(user)).thenReturn("JWT_TOKEN");
+
+        // WHEN
+        String token = userService.login(LOGIN, PASSWORD);
+
+        // THEN
+        assertThat(token).isEqualTo("JWT_TOKEN");
+        verify(passwordEncoder).matches(PASSWORD, "HASHED_PASSWORD");
+        verify(jwtService).generateToken(user);
     }
 }
