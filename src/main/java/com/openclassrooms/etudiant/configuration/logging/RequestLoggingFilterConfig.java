@@ -9,11 +9,13 @@ public class RequestLoggingFilterConfig {
     @Bean
     public CommonsRequestLoggingFilter commonsRequestLoggingFilter() {
         CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
-        filter.setIncludeQueryString(true);
-        filter.setIncludePayload(true);
-        filter.setMaxPayloadLength(10000);
+
+        filter.setIncludeQueryString(false);
+        filter.setIncludePayload(false);
         filter.setIncludeHeaders(false);
-        filter.setAfterMessagePrefix("REQUEST DATA: ");
+
+        filter.setAfterMessagePrefix("REQUEST: ");
+
         return filter;
     }
 }
